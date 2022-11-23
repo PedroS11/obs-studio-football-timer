@@ -1,0 +1,1 @@
+export const formatTime = (time: number): string => time.toString().padStart(2, '0')
