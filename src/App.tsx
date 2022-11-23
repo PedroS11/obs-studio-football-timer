@@ -9,10 +9,9 @@ import { Divider, TextField } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SaveIcon from '@mui/icons-material/Save';
+import { useEffect, useState } from "react";
 
 export default function App() {
-  const [isPlaying, setIsPlaying] = React.useState<boolean>(false);
-  const [currentTimeInSeconds, setCurrentTimeInSeconds] = React.useState<number>(0);
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
 
@@ -24,38 +23,43 @@ export default function App() {
     setSeconds(parseInt(event.target.value) || 0);
   };
 
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      if(isPlaying) {
-        setCurrentTimeInSeconds(currentTimeInSeconds + 0.2);
-      }
-    }, 200);
-
-    return () => clearInterval(timer);
-  }, [currentTimeInSeconds, isPlaying])
+    const [time, setTime] = useState(0);
+    const [running, setRunning] = useState(false);
+    useEffect(() => {
+        let interval:NodeJS.Timer;
+        if (running) {
+            interval = setInterval(() => {
+                setTime((prevTime) => prevTime + 10);
+            }, 10);
+        } else if (!running) {
+            // @ts-ignore
+            clearInterval(interval);
+        }
+        return () => clearInterval(interval);
+    }, [running]);
 
   return (
       <Container maxWidth="sm" >
         <Typography variant="h4" component="h1" gutterBottom>
-          {Math.floor(currentTimeInSeconds / 60).toString().padStart(2, '0')}:{Math.floor(currentTimeInSeconds % 60).toString().padStart(2, '0')}
+          {Math.floor(time / 60 /1000).toString().padStart(2, '0')}:{Math.floor(time /1000 % 60).toString().padStart(2, '0')}
         </Typography>
         <Stack direction="row" spacing={2} sx={{marginBottom: "16px"}}>
           <Button variant="outlined" endIcon={<StopIcon />} onClick={() => {
-            setIsPlaying(false);
-            setCurrentTimeInSeconds(0);
+              setRunning(false);
+            setTime(0);
           }}>
             Reset
           </Button>
           <Button variant="outlined" endIcon={<StopIcon />} onClick={() => {
-            setIsPlaying(false);
-            setCurrentTimeInSeconds(2700);
+              setRunning(false);
+            setTime(2700000);
           }}>
             2nd half
           </Button>
-          <Button variant="contained" endIcon={isPlaying? <PauseIcon />: <PlayArrowIcon/>} onClick={() => {
-            setIsPlaying(!isPlaying)
+          <Button variant="contained" endIcon={running? <PauseIcon />: <PlayArrowIcon/>} onClick={() => {
+              setRunning(!running)
           }}>
-            {isPlaying? "Pause": "Resume"}
+            {running? "Pause": "Resume"}
           </Button>
         </Stack>
         <Divider />
@@ -92,8 +96,8 @@ export default function App() {
           />
         </Box>
         <Button variant="outlined" endIcon={<SaveIcon />} onClick={() => {
-          setIsPlaying(false);
-          setCurrentTimeInSeconds(minutes * 60 + seconds);
+          setRunning(false);
+          setTime((minutes * 60 * 1000) + (seconds * 1000));
         }} sx={{marginTop: "10px"}}>
           Update time
         </Button>
