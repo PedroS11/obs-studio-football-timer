@@ -10,6 +10,7 @@ An OBS plugin that can be imported as browser source to display a timer.
 - Download the `build.zip` file
 - Extract the zip file
 - Go to OBS Studio and import the `build/index.html` file as a `Browser source`
+- Disable `Refresh browser when scene becomes active`
 - Crop just the timer and move to your desired place
 
 ### Include the timer in multiple scenes
